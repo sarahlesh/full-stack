@@ -6,7 +6,7 @@ var Login = React.createClass({
 		return {
 			email: '',
 			password: '',
-		  mode: 'signup',
+		  mode: 'login',
 		  error: null,
 		  name: ''
 		} 
@@ -14,24 +14,26 @@ var Login = React.createClass({
 
 	render: function(){
 		return(
-			<div>
+			<div className="login" id="login">
 				<p>{this.state.error}</p>
-				<label htmlFor="login">
-				  <input type='radio' id="login" value='login' checked={ this.state.mode == 'login' } onChange={ this.setMode } />
-				  Login
-				</label>
+				<label htmlFor="login">Login
+				  <input type='radio' id="login" name="login-signup" value='login' checked={ this.state.mode == 'login' } onChange={ this.setMode } />
+				 </label>
 
-				<label htmlFor="signup">
-				  <input type='radio' value='signup' checked={ this.state.mode == 'signup' } onChange={ this.setMode } />
-				  Signup
-				</label>
+				<label htmlFor="signup"> Signup	
+				  <input type='radio' id="signup" name="login-signup" value='signup' checked={ this.state.mode == 'signup' } onChange={ this.setMode } />
+				  </label>
+				{this.state.mode == "signup" ? <div><input type='text' className="login-input" placeholder="name" value={ this.state.name } onChange={ this.setName }/></div>: null}
 
-				{this.state.mode == "signup" ? <input type='text' placeholder="name" value={ this.state.name } onChange={ this.setName }/>: null}
-			  <input type='text' placeholder="email" value={ this.state.email } onChange={ this.setEmail }/>
+				<div>
+			  <input type='text' className="login-input" placeholder="email" value={ this.state.email } onChange={ this.setEmail }/>
+			  </div>
 
-			  <input type="password" placeholder="password" value={ this.state.password } onChange={ this.setPassword }/>
+			  <div>
+			  <input type="password" className="login-input" placeholder="password" value={ this.state.password } onChange={ this.setPassword }/>
+			  </div>
 
-			    <button onClick={ this.login } >{this.state.mode }</button>
+			    <button className="button" onClick={ this.login } >{this.state.mode }</button>
 
 			</div>
 			)
@@ -78,12 +80,6 @@ var Login = React.createClass({
 		  }
 		  if(this.state.mode === "login"){
 		   firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
-		   .then(function() {
-		           var user = firebase.auth().currentUser;
-		           user.updateProfile({
-		             displayName: component.state.name
-		           })
-		         })
 		   .then(function(data){
 		   	component.props.onLogin();
 		   })
