@@ -1,14 +1,15 @@
 import React from 'react';
 import firebase from 'firebase';
+import { browserHistory} from 'react-router';
 
 var Login = React.createClass({
 	getInitialState: function(){
 		return {
 			email: '',
 			password: '',
-		  mode: 'login',
-		  error: null,
-		  name: ''
+		 	mode: 'login',
+		 	error: null,
+		 	name: ''
 		} 
 	},
 
@@ -70,7 +71,9 @@ var Login = React.createClass({
 		      		         })
 		    })
 		    .then(function(data){
-		    	component.props.onLogin();
+
+		    	 browserHistory.push("/");
+
 		    })
 		    .catch(function(data){
 		      component.setState({
@@ -81,7 +84,9 @@ var Login = React.createClass({
 		  if(this.state.mode === "login"){
 		   firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
 		   .then(function(data){
-		   	component.props.onLogin();
+
+		   	browserHistory.push("/");
+
 		   })
 		   .catch(function(data){
 		      component.setState({

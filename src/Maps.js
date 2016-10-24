@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {  Link } from 'react-router';
 import firebase from "firebase";
 import reactfire from "reactfire";
+import $ from 'jquery';
 
 
 var Maps = React.createClass({
@@ -17,6 +18,7 @@ var Maps = React.createClass({
 
   render: function(){
       return (<div>
+      <h1>Welcome, { this.props.currentUser.displayName }</h1>
       <p>Your new current lat is: { this.state.newMap.lat }</p>
       <p>Your new current long is: { this.state.newMap.long }</p>
       <button onClick={ this.addNewLocation }>Add Location</button>
@@ -31,19 +33,7 @@ var Maps = React.createClass({
                  <button onClick={ this.deleteMap.bind(component, id) }>Delete</button> 
                </div>
              })}
-    <Link to="/login" onClick={ this.signOut }>Sign Out</Link>
     </div>)
-  },
-  signOut: function(){
-    var component = this;
-    firebase.auth().signOut().then(function() {
-      console.log("sign out")
-      component.setState({ 
-            loggedIn: false
-          });
-    }, function(error) {
-      console.error('Sign Out Error', error);
-    });
   },
   addNewLocation: function(){
      var newMap = {
@@ -62,7 +52,37 @@ var Maps = React.createClass({
       var component = this;
       console.log(this.firebaseRef.child(id))
       this.firebaseRef.child(id).remove();
-    }
+    },
+  componentDidMount:function() {
+
+    this.firebaseRef = firebase.database().ref('users/'+this.props.currentUser.uid+ '/maps'); 
+    this.firebaseRef.on("child_added", (dataSnapshot) => {
+      var maps = this.state.maps;
+      maps[dataSnapshot.key] = dataSnapshot.val();
+      this.setState({
+        maps: maps
+      })
+    })
+    this.firebaseRef.on("child_removed", (dataSnapshot) =>{
+      var maps = this.state.maps;
+      delete maps[dataSnapshot.key];
+      this.setState({ maps: maps })
+    })
+    $.ajax({
+      url: 'https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyDgfBW1IQdr_PnN2UIx_5PgzGfJ_EzeA90',
+      method: 'POST',
+      success: (data)=>{
+        var lat = data.location.lat;
+        var long = data.location.lng;
+        this.setState({
+          newMap:{
+            lat: lat,
+            long: long
+          }
+        })
+      }
+    })
+  }
 })
 
 export default Maps;

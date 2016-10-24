@@ -1,7 +1,10 @@
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import login from './login';
+import Login from './login';
+import Maps from './Maps';
+import UpdateProfile from './UpdateProfile';
 import './index.css';
 import firebase from "firebase";
 import { Router, Route, browserHistory, Link, IndexRoute } from 'react-router';
@@ -19,8 +22,11 @@ firebase.initializeApp(config);
 
 ReactDOM.render(
   <Router history={browserHistory}>
-  	<Route path="/login" component={ login }/>
-  	<Route path="/" component={ App } />
+      <Route path="/login"  component={ Login }/>
+      <Route path="/" component={App}>
+        <IndexRoute component={Maps} />
+        <Route path="profile" component={ UpdateProfile } />
+      </Route>
   </Router>,
   document.getElementById('root')
 );
