@@ -25,7 +25,9 @@ var Login = React.createClass({
 				  <input type='radio' id="signup" name="login-signup" value='signup' checked={ this.state.mode == 'signup' } onChange={ this.setMode } />
 				  </label>
 				{this.state.mode == "signup" ? <div><input type='text' className="login-input" placeholder="name" value={ this.state.name } onChange={ this.setName }/></div>: null}
-
+				<div>
+					<button onClick={ this.loginWithGoogle }>Sign In With Google</button>
+				</div>
 				<div>
 			  <input type='text' className="login-input" placeholder="email" value={ this.state.email } onChange={ this.setEmail }/>
 			  </div>
@@ -58,6 +60,16 @@ var Login = React.createClass({
 	setPassword: function(e) { this.setState({ 
 			password: e.target.value 
 		}); 
+	},
+	loginWithGoogle: function(){
+		var component = this;
+		var provider = new firebase.auth.GoogleAuthProvider();
+		if(this.state.mode === "login"){
+			firebase.auth().signInWithRedirect(provider)
+			.then(function(){
+				browserHistory.push("/");
+			})
+		}
 	},
 
 	login: function(){

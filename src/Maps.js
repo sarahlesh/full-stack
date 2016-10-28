@@ -25,7 +25,7 @@ var Maps = React.createClass({
       <p>Your new current long is: { this.state.newMap.long }</p>
       <button onClick={ this.addNewLocation }>Add Location</button>
 
-      <div className='map' ref={(div) => this.mapDiv = div } />
+      <div className='map' ref={this.showMarkers} />
 
       { Object.keys(this.state.maps).map((id) => {
                 var component = this;
@@ -57,11 +57,43 @@ var Maps = React.createClass({
       console.log(this.firebaseRef.child(id))
       this.firebaseRef.child(id).remove();
     },
+  showMarkers: function(mapDiv){
+    if (mapDiv) {
+      this.mapDiv = mapDiv;
+    }
+    GoogleMapsLoader.load((google) => {
+      if(!this.mapDiv || this.state.newMap.lat === null){
+        return;
+      }
+
+       var locations = this.state.maps;
+
+        var map = new google.maps.Map(this.mapDiv, {
+                     zoom: 2,
+                     center: {lat:this.state.newMap.lat, lng:this.state.newMap.long},
+        });
+
+        var marker, i;
+        // console.log(this.state.maps);
+
+        Object.keys(this.state.maps).map((id) => {
+          console.log(id)
+          var mapCoords = this.state.maps[id];
+                  marker = new google.maps.Marker({
+                                 position: new google.maps.LatLng(mapCoords.lat, mapCoords.long),
+                                 map: map
+                               });
+               })
+
+    });
+
+  },
   componentDidMount:function() {
     this.firebaseRef = firebase.database().ref('users/'+this.props.currentUser.uid+ '/maps'); 
     this.firebaseRef.on("child_added", (dataSnapshot) => {
       var maps = this.state.maps;
       maps[dataSnapshot.key] = dataSnapshot.val();
+      this.showMarkers();
       this.setState({
         maps: maps
       })
@@ -83,45 +115,6 @@ var Maps = React.createClass({
             long: long
           }
         })
-
-        GoogleMapsLoader.load((google) => {
-
-           var map = new google.maps.Map(this.mapDiv, {
-                         zoom: 15,
-                         center: {lat:this.state.newMap.lat, lng:this.state.newMap.long}
-            });
-
-            new google.maps.Marker({
-                         position: {lat:this.state.newMap.lat, lng:this.state.newMap.long},
-                         map: map,
-            });
-
-           // not sure if loading markers 
-
-            // var locations = [
-            //   ['Bondi Beach', -33.890542, 151.274856, 4],
-            //   ['Coogee Beach', -33.923036, 151.259052, 5],
-            //   ['Cronulla Beach', -34.028249, 151.157507, 3],
-            //   ['Manly Beach', -33.80010128657071, 151.28747820854187, 2],
-            //   ['Maroubra Beach', -33.950198, 151.259302, 1]
-            // ];
-
-            // var map = new google.maps.Map(this.mapDiv, {
-            //              zoom: 15,
-            //              center: {lat:-33.92, lng:151.25},
-            // });
-
-            // var marker, i;
-
-            // for (i = 0; i < locations.length; i++) { 
-            //   console.log(locations[i][1], locations[i][2])
-            //   marker = new google.maps.Marker({
-            //     position: new google.maps.LatLng(locations[i][1], locations[i][2]),
-            //     map: map
-            //   });
-            // }
-
-        });
       } //success
     }) //ajax
   }
